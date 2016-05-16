@@ -19,6 +19,7 @@ class Atom:
         self.atomic_number = Atom.atomic_numbers.get(symbol,0)
         self.init_lone_electrons_from_atomic_number()
         self.electronegativity = Atom.electro_negativities.get(symbol,0)
+        self.style="filled"
     
     def init_lone_electrons_from_atomic_number(self):
         if self.atomic_number>2:
@@ -57,6 +58,14 @@ class Atom:
             output_string+= "\n Formal Charge: " + str(self.formal_charge)
             
         print(output_string)
+
+    @property
+    def style(self):
+        return self._style
+    
+    @style.setter
+    def style(self,value):
+        self._style=value        
 
         
     @property
@@ -119,7 +128,7 @@ class Molecule:
         self.intermolecularbonds = []
         self.parts = []
         self._display_name = display_name or name
-            
+        self.style="filled"   
         self.name=name
         for symbol in name:
             a = Atom(symbol)
@@ -161,7 +170,15 @@ class Molecule:
     @display_name.setter
     def display_name(self,value):
         self._display_name=value
+
+    @property
+    def style(self):
+        return self._style
     
+    @style.setter
+    def style(self,value):
+        self._style=value
+        
     def to_dot(self):
         content = ""
         
