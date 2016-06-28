@@ -1,5 +1,15 @@
 from moleculemovies import * 
 
+#todo
+#all the different cross linking proteins and the kinds of resulting structures that they make
+#fimbin, alpha-actin, villin, spectim , filamen, dystrophin 
+
+
+#role of signals. 
+
+class GTPBindingSite(Molecule):
+    def __init__(self):
+        super(GTPBindingSite,self).__init__("GTP Binding Site")
 
 class ActinPositiveEnd(Molecule):
     def __init__(self):
@@ -9,7 +19,8 @@ class ActinMinusEnd(Molecule):
     def __init__(self):
         super(ActinMinusEnd, self).__init__("Actin - End")
 
-    
+
+
 class Actin(Protein):
     def __init__(self):
         super(Actin, self).__init__("Actin")
@@ -31,6 +42,69 @@ class Tropomysin(Protein):
     def __init__(self):
         super(Tropomysin, self).__init__("Tropomysin")
         
+class Filamin(Protein):        
+    def __init__(self):
+        super(Filamin, self).__init__("Filamin")
+    def description(self):
+        t = "Promotes the formation of a loose and highly viscouse gel by clamping together two acin filaments r oughtly at right angles"
+        t+="Helps cells make sheetlike membrane projections called lamellipodia"
+        t+="they interact iwth a large number of cellular proteins of different kinds, thus function as signaling scaffolds"
+        return t
+        
+class Spectrin(Protein):        
+    def __init__(self):
+        super(Spectrin, self).__init__("Spectrin")
+    def description(self):
+        t = "long flexible protein with 2 actin-filament-binding sites 200nm apart. Forms a 2 diemsnional weblike network of short actin filaments. creates a strong flexible cell cortex."
+        return t
+    #red blood cell
+    
+class Myosin(Protein):        
+    def __init__(self):
+        super(Myosin, self).__init__("Myosin")
+    def description(self):
+        t = "motor proteins that cross-link and slide actin filaments relative to one another"
+        t+="tail-tail interactions form large bipolar thick filaments of several hundred myosin heads"
+        t+="the mysosin head binds and hyrdolyzes ATP using the energy of ATP hydrolysis to walk toward the plus end of the acin filament"
+        return t
+    #red blood cell
+        
+#p917 why doesnt myosin fall off the acin during that cycle in p917 figure 16-29
+        
+        
+
+class AlphaTubulin(Protein):
+    def __init__(self):
+        super(AlphaTubulin, self).__init__("AlphaTubulin")
+        self.parts.append(GTPBindingSite())
+    def description(self):
+        return "445-450 amino acids. The GTP nucleotide is never hydrolized or exchanged because it is physically trapped at the dimer interface"
+
+        
+class BetaTublin(Protein):
+    def __init__(self):
+        super(Actin, self).__init__("BetaTublin")
+        self.parts.append(GTPBindingSite())
+    def description(self):
+        return "445-450 amino acids. The GTP nucleotide may be hydrolized or exchanged only in the soluble (unpolymerized) tubulin dimer."
+
+class TublinSubunit(Protein):
+    def __init__(self):
+        super(TublinSubunit, self).__init__("TublinSubunit")
+        self.parts.append(AlphaTubulin())
+        self.parts.append(BetaTublin())
+
+class Microtubule(Protein):
+    def __init__(self):
+        super(Actin, self).__init__("Actin")
+#        self.parts.append(ActinPositiveEnd())
+#        self.parts.append(ActinMinusEnd())
+
+    
+#motion myosin II on actin. 
+#tropmyosin blocks myson II from going, troponin holds topomysin on . ,   flood of Ca2+ makes troponin change so it moves tropomysoin out of the way the myosin can move 
+    
+            
 class CytoskeletonMovie(Environment):
     def __init__(self):
         super(CytoskeletonMovie, self).__init__()

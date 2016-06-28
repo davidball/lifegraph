@@ -209,3 +209,6 @@ def saveMovie(inputPrefix,outputPrefix,frameRate = "1/3",audioFile=None):
     os.system(cmd)
 
 
+
+#http://www.ncbi.nlm.nih.gov/nuccore
+

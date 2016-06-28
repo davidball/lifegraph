@@ -145,7 +145,12 @@ class RnaLoopingMovie(Environment):
         createAudioFile("output/looping","These are RNA sequences from figure 5.8 in the textbook Fundamentals of Molecular Virology. Be aware that the base pairing shown here is by a simple algorithm, not by natural findings.")
         saveMovie(self.frameFileName,"loopingFigure58",audioFile="output/looping.aiff",frameRate="3")
         
+    def generateMovieFromSequence(self,sequence,audioText,fileName):
         
+        self.single_strand_rna_animation(sequence,repeatFinalFrameTimes=5)
+        createAudioFile("output/looping",audioText)
+        saveMovie(self.frameFileName,fileName,audioFile="output/looping.aiff",frameRate="3")
+            
     def generate(self):   
         
         self.single_strand_rna_animation("GGCUAAAAAGCGCAUUUU",repeatFinalFrameTimes=5)
@@ -161,3 +166,14 @@ movie = RnaLoopingMovie()
 movie.generate()
 #movie.generateFigure58()
 #movie.generateFigure58Manual()
+#movie.generateMovieFromSequence()
+
+#mfold
+
+#you can form U-G base pairs , n
+
+#ncbi at nih nucleotides 
+
+#cucumosiais virus.  
+
+Documentar- Our Secret Universe The HIdden LIfe of the Cel....
