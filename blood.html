@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
+<zscript src="https://unpkg.com/d3-graphviz@0.1.2/build/d3-graphviz.js"></zscript>
+<script src="https://unpkg.com/d3-graphviz@1.3.1/build/d3-graphviz.min.js"></script>
+<div id="graph" style="text-align: center;"></div>
+<script>
+
+
+
+var innerLines = []
+
+var additions = [
+    [`blood [label="blood cells"];`],
+    ['r [label="red blood cells"];','blood -> r;'],
+    ['w [label="leukocytes"]', 'blood -> w;'],
+    ['p [label="platelets"]','blood -> p;'],
+    [`g [label="granulocyte"]
+w -> g;`],
+    [`l [label="lymphocytes"]
+w -> l;`],
+    
+[`mono [label="monocytes"]
+w -> mono;`],
+[`macro [label="macrophage"]
+mono -> macro;
+`],
+[`n [label="neutrophil"]
+g -> n;`],
+
+
+[`t [label="T lymphocytes"]
+l -> t;`],
+[`b [label="B lymphocytes"]
+l -> b;`]
+];
+
+
+var dots = [];
+for (lines of additions) {
+    innerLines = innerLines.concat(lines)
+    var dot = "digraph G {\n" + innerLines.join("\n") + "\n}";
+    dots.push(dot)
+}
+
+
+
+var dotIndex = 0;
+var graphviz = d3.select("#graph").graphviz()
+    .transition(function () {
+        return d3.transition("main")
+            .ease(d3.easeLinear)
+            .delay(100)
+            .duration(500);
+    })
+    //.logEvents(true)
+    //.on("initEnd", render);
+
+function render() {
+    var dot = dots[dotIndex];
+    
+    graphviz
+        .renderDot(dot)
+        .on("end", function () {
+            
+            dotIndex = dotIndex + 1;
+            if (dotIndex<dots.length){
+                render();
+            }
+            
+        });
+}
+render();
+</script>
+
