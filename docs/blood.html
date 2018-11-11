@@ -9,7 +9,95 @@
 <script>
 
 
+/*
+how to refactor:
+so there can be a total graph, the set of all edges and nodes ever. 
+there can be a series of frames, what to show at a unit of time. 
+there can be methods to add/remove edges/nodes from a frame to buidl another frame. 
 
+each frame is sematnicaly a subgraph.   in dat structure it is just a dot structure. 
+
+?or is it?
+
+what about properries at time points?  node and edge properties at time points? 
+
+so do we want to manage graph objects {nodes: {}, edges: {}}.  a global one perhaps but most important an array 
+of subgraphs at each time step. 
+
+we woudl convert each subgraph to_dot to make it's dot frame. 
+
+OR do we want to just manage lines in an array of .dot text?   [this seems easy at first but less flxielb.e]
+
+what is a good dsl or data structure for specifiing it. 
+
+Nodes:
+    b: blood
+    rbc: Red Blood Cell
+    l: Leukocytes
+    p: platelets
+
+Frames:
+    1:
+        b
+    2:
+        b -> rbc
+    3: 
+        b -> rbc
+        b -> l
+    4: 
+        b -> rbc
+        b -> l
+        b -> p
+
+OR
+Nodes:
+    b: blood
+    rbc: Red Blood Cell
+    l: Leukocytes
+    p: platelets
+
+Frames:
+    1:
+        b
+    2:  
+        add_edges:
+            b -> rbc
+    3: 
+        add_edges:        
+            b -> l
+    4: 
+        add_edges:
+            b -> p
+
+OR
+Nodes
+    b: blood
+    rbc: Red Blood Cell
+    l: Leukocytes
+    p: platelets
+
+
+Operations:
+b
+AddOneEdgePerFrame(b -> rbc, b -> l, b -> p)
+AddNodeProp(b, "color:red")
+RemoveEdgePerFrame(b -> rbc, b -> p)
+AddOneEdgePerFrame()
+Frames:
+    1:
+        b
+    2:  
+        add_edges:
+            b -> rbc
+    3: 
+        add_edges:        
+            b -> l
+    4: 
+        add_edges:
+            b -> p
+so we need sometimes to do 1 op per frame, sometimes many ops per frame, sometimes specify one thing that
+will become many frames. 
+*/
 var innerLines = []
 
 var additions = [
@@ -37,6 +125,158 @@ l -> t;`],
 l -> b;`]
 ];
 
+/*
+HSCs give rise to both the myeloid and lymphoid lineages of blood cells. Myeloid and lymphoid lineages both are involved in dendritic cell formation. 
+Myeloid cells include 
+    monocytes, macrophages, neutrophils, basophils, eosinophils, erythrocytes, and megakaryocytes to platelets. 
+Lymphoid cells include 
+T cells, B cells, and natural killer cells. 
+
+*/
+
+var round2 = [
+[`
+HSC;
+myeloid [label="Myeloid Lineage"]
+lymphoid [label="Lymphoid Lineage"]
+monocytes;
+macrophages;
+neutrophils;
+basophils;
+eosinophils;
+erythrocytes;
+megakaryocytes;
+platelets;
+TCells;
+BCells;
+NaturalKillerCells;
+HSC -> myeloid;
+myeloid -> monocytes;
+myeloid -> macrophages;
+myeloid -> neutrophils;
+myeloid -> basophils;
+myeloid -> eosinophils;
+myeloid -> erythrocytes;
+myeloid -> megakaryocytes;
+megakaryoctes -> platelets;
+HSC -> lymphoid;
+lymphoid -> TCells;
+lymphoid -> BCells;
+lymphoid -> NaturalKillerCells;
+`]
+];
+
+var frameOps = []; 
+var frameGraphs = [];
+
+class Graph {
+  constructor() {
+      this.nodes = new Map();
+      this.edges = new Map();
+  }
+  addNode(key, label) {
+      //if not label provided just use the key as the label
+      this.nodes.set(key, label||key)
+  }
+  addNodes(list_of_key_label) {
+      var self = this;
+      for (var n of list_of_key_label) {
+          self.addNode(n[0],n[1]);
+      }
+  }
+  addLinkedNode(source_key, target_key, target_label) {
+      //creates a target node that (may) not exist and links them.
+      this.addNode(target_key, target_label);
+      this.addEdge(source_key, target_key);
+  }
+  addLinkedNodes(l) {
+      //exepcts list of [source_key, target_key, target_label]
+      var self = this;
+      for (var item of l) {
+          self.addLinkedNode(item[0],item[1],item[2]);
+      }
+  }
+  addEdge(from_key, to_key, directed = true) {
+      var edgeKey = from_key + "-" + (directed ? ">" :"") + to_key;
+      this.edges.set(edgeKey,"")
+  }
+  addEdges(list_of_dot_edges) {
+      var self = this;
+      for (var e of list_of_dot_edges) {
+        var parts = e.split("->");
+          var directed = true;
+          if (parts.length<2) {
+              parts = e.split("-");
+              directed = false;
+          }
+          if (parts.length==2) {
+              self.addEdge(parts[0],parts[1],directed)
+          }
+      }
+
+  }
+  copy() {
+      var c = new Graph()
+      c.nodes = new Map(this.nodes);
+      c.edges = new Map(this.edges);
+      return c;
+  }
+  toDot() {
+ /* expects g= {"nodes":{Map}{node_id: DotString for node with label and other properties, }
+        ,edges: {Map} {"nodeid1->nodeid2":'dot string for any edge properties or blank ok too}}
+
+        use a js Map because order might matter for the dot to d3 business
+        */
+        var lines = []
+        for (var [key, value] of this.nodes)  {
+
+            lines.push(`${key} [label="${value}"];`);
+        };
+
+        for (var [key, value] of this.edges)  {
+            lines.push(key  + ";")
+        };
+        
+        
+        var dotstring = "digraph G {\n" + lines.join("\n") + "\n}";
+
+        return dotstring;
+  }
+}
+
+function makeSample() {
+    g = new Graph;
+
+    g.addNode("blood", "Blood Cells")
+
+
+}
+
+
+function makeDotsFromSubGraphs(startGraph, operations) {
+    var dots = [];
+    dots.push(startGraph.toDot());
+
+    currentGraph = startGraph.copy();
+    for (var op of operations) {
+        //tmp assume op is add. 
+        var opname = op[0];
+        if (opname=="addnode") {
+            currentGraph.addNode(op[1],op[2]);
+        } else if (opname == "addedge") {
+            currentGraph.addEdge(op[1],op[2]);
+        } else if (opname == "addlinkednode") {
+            //expects [opname, sourcekey, targetkey, targetlabel]
+            currentGraph.addLinkedNode(op[1],op[2],op[3]);
+        } else if (opname=="addlinkednodes") {
+            currentGraph.addLinkedNodes(op[1]);
+        }
+        dots.push(currentGraph.toDot())
+    }
+    return dots;
+}
+
+function makeDotsBySuccessivelyAddingLines(additions){
 
 var dots = [];
 for (lines of additions) {
@@ -44,16 +284,77 @@ for (lines of additions) {
     var dot = "digraph G {\n" + innerLines.join("\n") + "\n}";
     dots.push(dot)
 }
+return dots;
+}
 
 
+//dots = makeDotsBySuccessivelyAddingLines(additions);
+
+
+function makeExampleDots() {
+
+var graph1 = new Graph;
+
+graph1.addNodes([['a','aaaaa'],['b','bbbbb']]);
+graph1.addEdges(['a->b']);
+
+var operations = [
+    ["addnode","dog","The Dog"],
+    ["addnode","hunt","Hunt Coyote"],
+    ["addedge","dog","hunt"],
+    ["addlinkednode","hunt","squirel","squireltoo are nice and would suffice"],
+    ["addedge","b","hunt"],
+    ["addedge","dog","a"],
+    ["addlinkednodes",[["a","a1","A1"], 
+    ["a","a2","A2"],
+    ["a","a3","A3"]
+        ]]
+]
+
+    return makeDotsFromSubGraphs(graph1, operations);
+}
+
+function makeBloodCategoryDots() {
+
+var graph1 = new Graph;
+
+graph1.addNodes([['blood','Blood Cell Types']]);
+
+
+var operations = [
+    ["addlinkednode","blood","r","Red Blood Cells"],
+    ["addlinkednode","blood","w","Leukocytes\n(White Blood Cells)"],
+    ["addlinkednode","blood","p","Platelets"],
+    ["addlinkednode","w","g","Granulocytes"],
+
+    ["addlinkednode","w","l","Lymphocytes"],
+    ["addlinkednode","w","mono","Monocytes"],
+    ["addlinkednode","w","macro","Macrophages"],
+    ["addlinkednode","g","n","Neutrophils"],
+    ["addlinkednode","l","t","T Lymphocytes"],
+    ["addlinkednode","l","b","B lymphocytes"],
+    ["addnode","amlnote","AML Starts in the \nPrecursors of Neutrophils \" fillcolor=red style=filled color=red shape=\"rectangle"],
+    ["addedge","amlnote","n"]
+    
+
+]
+
+    return makeDotsFromSubGraphs(graph1, operations);
+}
+
+dots = makeBloodCategoryDots();
+
+
+
+function renderArrayOfDots(dots) {
 
 var dotIndex = 0;
 var graphviz = d3.select("#graph").graphviz()
     .transition(function () {
         return d3.transition("main")
             .ease(d3.easeLinear)
-            .delay(100)
-            .duration(500);
+            .delay(10)
+            .duration(200);
     })
     //.logEvents(true)
     //.on("initEnd", render);
@@ -73,5 +374,8 @@ function render() {
         });
 }
 render();
+}
+
+renderArrayOfDots(dots);
 </script>
 
