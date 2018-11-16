@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
+<zscript src="https://unpkg.com/d3-graphviz@0.1.2/build/d3-graphviz.js"></zscript>
+<script src="https://unpkg.com/d3-graphviz@1.3.1/build/d3-graphviz.min.js"></script>
+<script src="graphmovie.js" async=false></script>
+<div id="graph" style="text-align: center;"></div>
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+
+<script>
+
+
+function makeBloodCategoryDots() {
+
+var graph1 = new Graph;
+
+graph1.addNodes([['acedia','Acedia']]);
+
+
+var operations = [
+    ["addlinkednode","acedia","despair","Despair"],
+    ["addlinkednode","acedia","em","evagatio mentis"],
+    ["addlinkednode","acedia","torpor","A sluggish indifference (torpor) toward those things that are in truth necessary for man's salvation"],
+    ["addlinkednode","em","emdef","definition: an uneasy restlessness of mind"],
+    ["addlinkednode","em","emrev","Evagatio Mentis Reveals Itself in:"],
+    ["addlinkednode","emrev","loq","Loquaciousness (verbositas)"],
+    ["addlinkednode","emrev","cur","Excessive Curiosity (curiositas)"],
+    ["addlinkednode","emrev","irr","Irreverent urge 'to pour oneself out from the peak of the mind onto many things (importunitas)"],
+    ["addlinkednode","emrev","imp","interior restlessness (inquietudo)"],
+    ["addlinkednode","emrev","inq","instability of place or purpose (instibilitas loci vel  propositi)"],
+    
+    
+
+]
+
+    return makeDotsFromSubGraphs(graph1, operations);
+}
+
+
+
+function init() {
+    dots = makeBloodCategoryDots();
+    renderArrayOfDots(dots);
+}
+$(init);
+
+
+</script>
+
