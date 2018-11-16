@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
+<zscript src="https://unpkg.com/d3-graphviz@0.1.2/build/d3-graphviz.js"></zscript>
+<script src="https://unpkg.com/d3-graphviz@1.3.1/build/d3-graphviz.min.js"></script>
+<script src="graphmovie.js" async=false></script>
+<div id="graph" style="text-align: center;"></div>
+
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+
+<script>
+
+
+function makeBloodCategoryDots() {
+
+var graph1 = new Graph;
+
+var name_stem = 'Stem\nCell'
+graph1.addNodes([['stem',name_stem]]);
+
+var name_more1 = "Blood\nCell"
+
+var name_aml = "AML\nCell"
+var operations = [
+    ["addlinkednode","stem","p2_1",name_stem],
+    ["addlinkednode","stem","p2_2",name_stem],
+    ["addlinkednode","p2_1","p2_1_1",name_aml],
+    ["addlinkednode","p2_1","p2_1_2",name_aml],
+    ["addlinkednode","p2_2","p2_2_1",name_more1],        
+    ["addlinkednode","p2_2","p2_2_2",name_more1],     
+    ["removenode","p2_1"],            
+    ["removenode","p2_2"],
+    ["addlinkednode","p2_1_1","aml_1",name_aml],              
+    ["addlinkednode","p2_1_1","aml_2",name_aml],              
+    ["addlinkednode","p2_1_2","aml_3",name_aml],              
+    ["addlinkednode","p2_1_2","aml_4",name_aml]
+]
+
+    return makeDotsFromSubGraphs(graph1, operations);
+}
+
+
+
+function init() {
+    dots = makeBloodCategoryDots();
+    renderArrayOfDots(dots);
+}
+//$(init);
+
+
+</script>
+
+<h1>Understanding AML Demos</h1>
+
+<a href="/blood2.html"> Blood Cell Categories</a>
+<a href="/aml_diff.html">Healthy Differentiation</a>
+<a href="/aml_diff2.html">AML Impacted Differentiation</a>
